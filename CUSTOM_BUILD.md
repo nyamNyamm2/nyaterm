@@ -57,7 +57,10 @@ verifies package contents. The artifact includes:
 
 - `NyaTerm_2.0.4-custom.1_windows-x64-setup.exe`
 - `NyaTerm_2.0.4-custom.1_windows-x64_portable.zip`
-- `cluster-tools.zip`
+- `SOURCE_COMMIT.txt` and `SHA256SUMS.txt`
+
+The separately uploaded `NyaTerm-cluster-tools-plugin-<commit>` artifact contains
+`cluster-tools.zip`.
 
 Open the passing GitHub Actions run, download its
 `NyaTerm-custom-Windows-x64-<commit>` artifact and unzip the artifact wrapper.
