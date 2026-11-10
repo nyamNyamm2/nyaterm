@@ -37,6 +37,8 @@ impl NyaTermApp {
         if self.cluster.pending {
             return;
         }
+        self.cluster.session_id = self.session.active_id_owned();
+        self.cluster.query = Some(query);
         let context = match self.active_ssh_runtime_context("reading cluster resources") {
             Ok(context) => context,
             Err(message) => {
@@ -335,7 +337,7 @@ mod tests {
     }
     #[test]
     fn all_custom_panels_render_with_sync_off() {
-        let root = TestTempDir::new("cluster-panel-render");
+        let root = TestTempDir::new("nyaterm-cluster-panel-render");
         let mut cx = TestAppContext::single();
         let _cleanup = crate::test_support::TestAppCleanup::new(&cx);
         let app = app_with_visible_local_session(&mut cx, root.path(), "cluster-panel-session");
@@ -361,7 +363,7 @@ mod tests {
     }
     #[test]
     fn changing_scope_invalidates_pending_result_and_clears_output() {
-        let root = TestTempDir::new("cluster-scope");
+        let root = TestTempDir::new("nyaterm-cluster-scope");
         let mut cx = TestAppContext::single();
         let _cleanup = crate::test_support::TestAppCleanup::new(&cx);
         let app = app_with_visible_local_session(&mut cx, root.path(), "cluster-scope-session");
