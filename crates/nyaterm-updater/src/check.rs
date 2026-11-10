@@ -9,6 +9,9 @@ const MAX_MANIFEST_BYTES: u64 = 1024 * 1024;
 const USER_AGENT: &str = concat!("nyaterm-app/", env!("CARGO_PKG_VERSION"));
 
 pub fn check_native_update() -> Result<NativeUpdateInfo, String> {
+    if nyaterm_core::packaging::updates_managed_externally() {
+        return Err("This custom build uses manual GitHub updates".into());
+    }
     let current_version =
         parse_current_version(env!("CARGO_PKG_VERSION")).map_err(|error| error.to_string())?;
     let channel = UpdateChannel::for_version(&current_version);

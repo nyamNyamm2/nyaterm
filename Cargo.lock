@@ -6836,6 +6836,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "nyaterm-cluster-commands"
+version = "0.1.0"
+
+[[package]]
 name = "nyaterm-core"
 version = "2.0.4"
 dependencies = [
@@ -6898,6 +6902,7 @@ dependencies = [
  "keyring",
  "nyaterm-ai-client",
  "nyaterm-cloud-storage",
+ "nyaterm-cluster-commands",
  "nyaterm-core",
  "nyaterm-files",
  "nyaterm-mcp-protocol",
@@ -7091,6 +7096,7 @@ name = "nyaterm-remote-ops"
 version = "2.0.4"
 dependencies = [
  "anyhow",
+ "nyaterm-cluster-commands",
  "nyaterm-core",
  "nyaterm-transport",
  "russh",

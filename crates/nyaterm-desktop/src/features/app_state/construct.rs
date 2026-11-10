@@ -418,6 +418,7 @@ impl NyaTermApp {
                 right_panel_width,
                 activity_bar_layout,
             }),
+            cluster: Default::default(),
             sync_input: SyncInputFeatureState::new(cx.focus_handle()),
             settings: SettingsFeatureState::new(
                 SettingsFeatureInit {

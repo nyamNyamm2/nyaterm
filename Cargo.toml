@@ -2,6 +2,7 @@
 # The application resolves its helpers beside its executable. Include the Windows
 # ActiveX host in development builds; release packaging filters it by platform.
 default-members = [
+    "crates/nyaterm-cluster-commands",
     "crates/nyaterm-app",
     "crates/nyaterm-mcp",
     "crates/nyaterm-rdp-helper",

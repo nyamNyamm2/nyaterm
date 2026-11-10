@@ -53,6 +53,11 @@ impl NyaTermApp {
         cx: &mut Context<Self>,
     ) -> gpui::AnyElement {
         match panel {
+            NavItem::Kubernetes => self.cluster_panel(true, cx).into_any_element(),
+            NavItem::Slurm => self.cluster_panel(false, cx).into_any_element(),
+            NavItem::SyncInput | NavItem::Layouts => {
+                self.workspace_tools_panel(panel, cx).into_any_element()
+            }
             NavItem::Plugins => self.plugins.panel.clone().into_any_element(),
             NavItem::Transfers => self
                 .transfer_panel
