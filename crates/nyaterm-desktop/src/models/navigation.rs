@@ -445,10 +445,6 @@ impl ActivityBarLayoutState {
     /// those missing slots, retaining unknown ids and all saved visibility.
     pub(crate) fn ensure_remote_monitor_entries(&mut self) {
         for (id, anchor) in [
-            ("kubernetesManager", "dockerManager"),
-            ("slurmManager", "kubernetesManager"),
-            ("syncInput", "slurmManager"),
-            ("layouts", "syncInput"),
             ("gpuMonitor", "resourceMonitor"),
             ("ascendNpuMonitor", "gpuMonitor"),
         ] {
@@ -467,6 +463,14 @@ impl ActivityBarLayoutState {
                 })
                 .unwrap_or(self.right_top.len());
             self.right_top.insert(insert_at, id.into());
+        }
+    }
+
+    pub(crate) fn ensure_custom_entries(&mut self) {
+        for id in ["kubernetesManager", "slurmManager", "syncInput", "layouts"] {
+            if self.find_entry(id).is_none() {
+                self.right_top.push(id.into());
+            }
         }
     }
 
@@ -841,6 +845,10 @@ mod tests {
                 "ascendNpuMonitor",
                 "processManager",
                 "dockerManager",
+                "kubernetesManager",
+                "slurmManager",
+                "syncInput",
+                "layouts",
             ]
         );
     }

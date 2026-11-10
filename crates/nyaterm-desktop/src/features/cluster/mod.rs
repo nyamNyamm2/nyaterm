@@ -125,7 +125,7 @@ impl NyaTermApp {
                     div()
                         .w_full()
                         .h(px(32.))
-                        .child(NyaInputShell::new(format!("cluster-{key}"), input)),
+                        .child(NyaInputShell::new(format!("cluster-{key}"), &input)),
                 );
             }
         }
@@ -271,7 +271,7 @@ impl NyaTermApp {
                 div()
                     .w_full()
                     .h(px(32.))
-                    .child(NyaInputShell::new("sidebar-sync-name", input)),
+                    .child(NyaInputShell::new("sidebar-sync-name", &input)),
             );
             body = body.child(small_button(
                 palette,
@@ -311,5 +311,68 @@ impl NyaTermApp {
             "Open full group manager",
             cx.listener(|this, _, window, cx| this.open_sync_groups(window, cx)),
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::features::{NyaTermApp, test_support::app_with_visible_local_session};
+    use crate::models::NavItem;
+    use gpui::{Context, Entity, IntoElement, Render, TestAppContext, Window, div, prelude::*};
+    use nyaterm_core::test_support::TestTempDir;
+    struct PanelFixture {
+        app: Entity<NyaTermApp>,
+        panel: NavItem,
+    }
+    impl Render for PanelFixture {
+        fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+            let panel = self.panel;
+            let content = self
+                .app
+                .update(cx, |app, cx| app.panel_body(panel, window, cx));
+            div().size_full().child(content)
+        }
+    }
+    #[test]
+    fn all_custom_panels_render_with_sync_off() {
+        let root = TestTempDir::new("cluster-panel-render");
+        let mut cx = TestAppContext::single();
+        let _cleanup = crate::test_support::TestAppCleanup::new(&cx);
+        let app = app_with_visible_local_session(&mut cx, root.path(), "cluster-panel-session");
+        app.update(&mut cx, |app, cx| {
+            app.sync_component_theme(cx);
+            assert!(!app.sync_input.input_selection_active());
+            app.create_sync_group(cx);
+            assert!(!app.sync_input.input_selection_active());
+        });
+        for panel in [
+            NavItem::Kubernetes,
+            NavItem::Slurm,
+            NavItem::SyncInput,
+            NavItem::Layouts,
+        ] {
+            let app = app.clone();
+            let (_, visual) = cx.add_window_view(move |_, _| PanelFixture { app, panel });
+            visual.run_until_parked();
+            visual.update(|window, cx| {
+                let _ = window.draw(cx);
+            });
+        }
+    }
+    #[test]
+    fn changing_scope_invalidates_pending_result_and_clears_output() {
+        let root = TestTempDir::new("cluster-scope");
+        let mut cx = TestAppContext::single();
+        let _cleanup = crate::test_support::TestAppCleanup::new(&cx);
+        let app = app_with_visible_local_session(&mut cx, root.path(), "cluster-scope-session");
+        app.update(&mut cx, |app, cx| {
+            app.cluster.output = "old host data".into();
+            app.cluster.pending = true;
+            let generation = app.cluster.generation;
+            app.apply_cluster_input("namespace", "team-a".into(), cx);
+            assert!(app.cluster.output.is_empty());
+            assert_ne!(app.cluster.generation, generation);
+            assert!(app.cluster.pending);
+        });
     }
 }
