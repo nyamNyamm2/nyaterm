@@ -1753,6 +1753,7 @@ fn sync_paste_encodes_each_live_target_and_stops_when_primary_cannot_encode() {
             .clone();
         let mut ids = Vec::new();
         app.sync_input.create_group();
+        app.sync_input.toggle_selected_enabled();
         for encoding in ["GB18030", "UTF-8", "GBK"] {
             let config = TelnetSessionConfig {
                 host: "127.0.0.1".into(),
@@ -1854,6 +1855,7 @@ fn recording_sensitive_prompts_are_session_local_for_sync_keyboard_paste_and_raw
         let metadata = app.session.metadata("fixture").unwrap().clone();
         let mut ids = Vec::new();
         app.sync_input.create_group();
+        app.sync_input.toggle_selected_enabled();
         for index in 0..2 {
             let config = TelnetSessionConfig {
                 host: "127.0.0.1".into(),

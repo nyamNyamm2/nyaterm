@@ -54,6 +54,7 @@ fn mac_copy_has_no_wire_effect_and_insert_preserves_paste_framing_and_sync(
         let manager = app.session.manager_handle();
         let metadata = app.session.metadata("fixture").unwrap().clone();
         app.sync_input.create_group();
+        app.sync_input.toggle_selected_enabled();
         let mut ids = Vec::new();
         for encoding in ["GBK", "UTF-8"] {
             let config = TelnetSessionConfig {

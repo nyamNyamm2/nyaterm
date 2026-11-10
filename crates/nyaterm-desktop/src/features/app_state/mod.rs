@@ -114,6 +114,7 @@ pub struct NyaTermApp {
     pub(in crate::features) session: SessionFeatureState,
     pub(in crate::features) activation: super::activation::ActivationFeatureState,
     pub(in crate::features) shell: ShellFeatureState,
+    pub(in crate::features) cluster: super::cluster::ClusterFeatureState,
     pub(in crate::features) sync_input: SyncInputFeatureState,
     pub(in crate::features) recording: RecordingFeatureState,
     pub(in crate::features) tmux: super::tmux::TmuxFeatureState,

@@ -1,0 +1,112 @@
+name: Custom Windows x64
+on:
+  push:
+    branches: ['feature/**', 'upstream/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: custom-windows-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+  NYATERM_PACKAGE_MANAGER: nyamNyamm2-custom-manual
+jobs:
+  validate:
+    name: Rust and UI validation
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: ./.github/actions/setup-rust
+        with:
+          targets: x86_64-pc-windows-msvc,wasm32-unknown-unknown
+          components: rustfmt,clippy
+          cache-key: custom-windows
+          save-cache: always
+          cache-on-failure: 'true'
+      - name: Formatting
+        run: cargo fmt --all -- --check
+      - name: Check workspace
+        run: cargo check --locked --workspace
+      - name: Rust policy and integration tests
+        run: cargo test --locked -p nyaterm-cluster-commands -p nyaterm-remote-ops -p nyaterm-core -p nyaterm-updater
+      - name: Custom panel rendering and state tests
+        run: cargo test --locked -p nyaterm-desktop --lib features::cluster::tests -- --nocapture --test-threads=1
+      - name: Desktop state and UI tests
+        run: cargo test --locked -p nyaterm-desktop --lib -- --nocapture --test-threads=1
+      - name: Clippy
+        if: ${{ !cancelled() }}
+        run: cargo clippy --locked --workspace --all-targets
+      - name: Build and validate external SDK plugins
+        if: ${{ !cancelled() }}
+        run: python scripts/plugins/build.py
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: NyaTerm-cluster-tools-plugin-${{ github.sha }}
+          path: target/plugin-examples/cluster-tools.zip
+          if-no-files-found: error
+          retention-days: 90
+  package:
+    name: Windows EXE and Portable ZIP
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve custom package version
+        shell: pwsh
+        run: |
+          $version = python -c "import tomllib; print(tomllib.load(open('Cargo.toml', 'rb'))['workspace']['package']['version'])"
+          "NYATERM_VERSION=$version" >> $env:GITHUB_ENV
+          $separator = if ($version.Contains('-')) { '.' } else { '-' }
+          "NYATERM_ARTIFACT_VERSION=$version${separator}custom.1" >> $env:GITHUB_ENV
+      - uses: ./.github/actions/setup-rust
+        with:
+          targets: x86_64-pc-windows-msvc
+          cache-key: custom-windows-package
+          save-cache: always
+          cache-on-failure: 'true'
+      - name: Install NSIS
+        shell: pwsh
+        run: ./scripts/ci/install-nsis.ps1
+      - name: Prepare bundled ConPTY
+        run: python scripts/release/prepare_conpty.py
+      - name: Build Windows x64 installer and portable ZIP
+        shell: pwsh
+        run: python scripts/release/package_native.py x86_64-pc-windows-msvc
+      - name: Verify packages
+        shell: pwsh
+        run: python scripts/release/verify_native_package.py --target x86_64-pc-windows-msvc --version "$env:NYATERM_VERSION" --artifact-version "$env:NYATERM_ARTIFACT_VERSION" --dist dist
+      - name: Record source and checksums
+        shell: python
+        run: |
+          import hashlib, pathlib, subprocess
+          dist = pathlib.Path('dist')
+          (dist / 'SOURCE_COMMIT.txt').write_text(subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True))
+          assets = sorted(dist.glob('*-setup.exe')) + sorted(dist.glob('*_portable.zip'))
+          assert len(assets) == 2
+          (dist / 'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + '\n' for p in assets))
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NyaTerm-custom-Windows-x64-${{ github.sha }}
+          path: |
+            dist/*-setup.exe
+            dist/*_portable.zip
+            dist/SOURCE_COMMIT.txt
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90

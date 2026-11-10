@@ -58,6 +58,10 @@ pub(crate) enum NavItem {
     AscendNpuMonitor,
     Processes,
     Docker,
+    Kubernetes,
+    Slurm,
+    SyncInput,
+    Layouts,
     Transfers,
     Notes,
     Settings,
@@ -80,6 +84,9 @@ impl NavItem {
             NavItem::AscendNpuMonitor => "panel.npuMonitor",
             NavItem::Processes => "panel.processManager",
             NavItem::Docker => "panel.dockerManager",
+            NavItem::Kubernetes | NavItem::Slurm | NavItem::SyncInput | NavItem::Layouts => {
+                return None;
+            }
             NavItem::Transfers => "panel.fileExplorer",
             NavItem::Notes => "panel.notes",
             NavItem::Settings => "settings.title",
@@ -104,6 +111,10 @@ impl NavItem {
             NavItem::AscendNpuMonitor => "Ascend NPU Monitor",
             NavItem::Processes => "Process Manager",
             NavItem::Docker => "Docker",
+            NavItem::Kubernetes => "Kubernetes Manager",
+            NavItem::Slurm => "Slurm Manager",
+            NavItem::SyncInput => "Sync Input",
+            NavItem::Layouts => "Split / Layouts",
             NavItem::Transfers => "File Explorer",
             NavItem::Notes => "Notes",
             NavItem::Settings => "Settings",
@@ -132,6 +143,10 @@ impl NavItem {
             NavItem::AscendNpuMonitor => "NPU",
             NavItem::Processes => "Processes",
             NavItem::Docker => "Docker",
+            NavItem::Kubernetes => "Kubernetes Manager",
+            NavItem::Slurm => "Slurm Manager",
+            NavItem::SyncInput => "Sync Input",
+            NavItem::Layouts => "Split / Layouts",
             NavItem::SyncBackupHistory => "Cloud Sync",
             NavItem::SecurityAuth => "Security",
             NavItem::Recording => "Recording",
@@ -161,6 +176,10 @@ impl NavItem {
             NavItem::AscendNpuMonitor => "icons/npu.svg",
             NavItem::Processes => "icons/processes.svg",
             NavItem::Docker => "icons/docker.svg",
+            NavItem::Kubernetes => "icons/network.svg",
+            NavItem::Slurm => "icons/resources.svg",
+            NavItem::SyncInput => "icons/sync.svg",
+            NavItem::Layouts => "icons/menu/split.svg",
             NavItem::Recording => "icons/record.svg",
             NavItem::Workspace => "icons/workspace.svg",
         }
@@ -190,6 +209,10 @@ impl NavItem {
                 | NavItem::AscendNpuMonitor
                 | NavItem::Processes
                 | NavItem::Docker
+                | NavItem::Kubernetes
+                | NavItem::Slurm
+                | NavItem::SyncInput
+                | NavItem::Layouts
                 | NavItem::Recording
                 | NavItem::Workspace
         )
@@ -210,6 +233,10 @@ impl NavItem {
             NavItem::AscendNpuMonitor => "ascendNpuMonitor",
             NavItem::Processes => "processManager",
             NavItem::Docker => "dockerManager",
+            NavItem::Kubernetes => "kubernetesManager",
+            NavItem::Slurm => "slurmManager",
+            NavItem::SyncInput => "syncInput",
+            NavItem::Layouts => "layouts",
             NavItem::Transfers => "fileExplorer",
             NavItem::Notes => "notes",
             NavItem::Settings => "settings",
@@ -233,6 +260,10 @@ impl NavItem {
             "npu" | "ascendNpuMonitor" => Some(NavItem::AscendNpuMonitor),
             "processes" | "processManager" => Some(NavItem::Processes),
             "docker" | "dockerManager" => Some(NavItem::Docker),
+            "kubernetesManager" => Some(NavItem::Kubernetes),
+            "slurmManager" => Some(NavItem::Slurm),
+            "syncInput" => Some(NavItem::SyncInput),
+            "layouts" => Some(NavItem::Layouts),
             "fileExplorer" | "fileTransfer" | "transfers" => Some(NavItem::Transfers),
             "notes" => Some(NavItem::Notes),
             "settings" => Some(NavItem::Settings),
@@ -392,6 +423,10 @@ impl Default for ActivityBarLayoutState {
                 "ascendNpuMonitor".to_string(),
                 "processManager".to_string(),
                 "dockerManager".to_string(),
+                "kubernetesManager".to_string(),
+                "slurmManager".to_string(),
+                "syncInput".to_string(),
+                "layouts".to_string(),
             ],
             right_bottom: vec![
                 "quickCmdBar".to_string(),
@@ -428,6 +463,14 @@ impl ActivityBarLayoutState {
                 })
                 .unwrap_or(self.right_top.len());
             self.right_top.insert(insert_at, id.into());
+        }
+    }
+
+    pub(crate) fn ensure_custom_entries(&mut self) {
+        for id in ["kubernetesManager", "slurmManager", "syncInput", "layouts"] {
+            if self.find_entry(id).is_none() {
+                self.right_top.push(id.into());
+            }
         }
     }
 
@@ -802,6 +845,10 @@ mod tests {
                 "ascendNpuMonitor",
                 "processManager",
                 "dockerManager",
+                "kubernetesManager",
+                "slurmManager",
+                "syncInput",
+                "layouts",
             ]
         );
     }

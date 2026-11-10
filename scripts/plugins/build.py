@@ -37,7 +37,7 @@ def main():
     output = ROOT / "target/plugin-examples"
     output.mkdir(parents=True, exist_ok=True)
     guest_target = cargo_target(ROOT / "examples/plugins/guests/Cargo.toml")
-    for name in ["templates", "diagnostic-command", "text-tools"]:
+    for name in ["templates", "diagnostic-command", "text-tools", "cluster-tools"]:
         destination = output / name
         shutil.copytree(ROOT / "examples/plugins" / name, destination, dirs_exist_ok=True)
         if name != "templates":

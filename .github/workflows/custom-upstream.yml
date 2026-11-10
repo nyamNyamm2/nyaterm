@@ -1,0 +1,34 @@
+name: Propose upstream release merge
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Official nyakang/nyaterm release tag (for example v2.0.4)
+        required: true
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Merge official release into a review branch
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-][a-zA-Z0-9.]+)?$ ]] || exit 1
+          gh api "repos/nyakang/nyaterm/releases/tags/$RELEASE_TAG" > /tmp/release.json
+          git remote add official https://github.com/nyakang/nyaterm.git
+          git fetch official "refs/tags/$RELEASE_TAG"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "upstream/$RELEASE_TAG-${GITHUB_RUN_ID}" origin/main
+          git merge --no-ff FETCH_HEAD -m "chore(upstream): merge $RELEASE_TAG for review"
+          git push origin HEAD
+          gh pr create --draft --base main --head "upstream/$RELEASE_TAG-${GITHUB_RUN_ID}" --title "chore(upstream): review $RELEASE_TAG" --body 'Review upstream integration and custom channel protection. Require passing Custom Windows x64 tests/artifacts before manually merging. No automatic merge.'
+          gh workflow run custom-windows.yml --ref "upstream/$RELEASE_TAG-${GITHUB_RUN_ID}"

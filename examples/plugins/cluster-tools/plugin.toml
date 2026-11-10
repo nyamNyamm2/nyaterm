@@ -1,0 +1,156 @@
+schema_version = 1
+id = "cluster-tools"
+name = "Cluster read-only command tools"
+version = "1.0.0"
+authors = ["nyamNyamm2"]
+description = "Validated Kubernetes and Slurm command drafts; requires remote timeout command. Sidebar execution uses the native SSH adapter."
+host_version = ">=2.0.0"
+api_version = "1.0.0"
+component = "plugin.wasm"
+
+[[actions]]
+id = "contexts"
+name = "contexts"
+description = "Read-only contexts query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "namespaces"
+name = "namespaces"
+description = "Read-only namespaces query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "nodes"
+name = "nodes"
+description = "Read-only nodes query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "pods"
+name = "pods"
+description = "Read-only pods query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "deployments"
+name = "deployments"
+description = "Read-only deployments query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "events"
+name = "events"
+description = "Read-only events query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+
+[[actions]]
+id = "logs"
+name = "logs"
+description = "Read-only logs query"
+result = "command"
+[[actions.parameters]]
+id = "context"
+name = "context"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "namespace"
+name = "namespace"
+kind = "string"
+required = false
+[[actions.parameters]]
+id = "pod"
+name = "pod"
+kind = "string"
+required = true
+
+[[actions]]
+id = "jobs"
+name = "jobs"
+description = "Read-only jobs query"
+result = "command"
+
+[[actions]]
+id = "partitions"
+name = "partitions"
+description = "Read-only partitions query"
+result = "command"
+
+[[actions]]
+id = "slurm-nodes"
+name = "slurm-nodes"
+description = "Read-only slurm-nodes query"
+result = "command"
+
+[[actions]]
+id = "gpu"
+name = "gpu"
+description = "Read-only gpu query"
+result = "command"
+
+[[actions]]
+id = "scheduler"
+name = "scheduler"
+description = "Read-only scheduler query"
+result = "command"

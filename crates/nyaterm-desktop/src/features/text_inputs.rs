@@ -583,6 +583,8 @@ impl NyaTermApp {
             self.apply_recording_search(text, cx);
         } else if id.as_ref() == "settings.keybindings.search" {
             self.apply_keybinding_search(text, cx);
+        } else if let Some(field) = id.strip_prefix("cluster.") {
+            self.apply_cluster_input(field, text, cx);
         } else if id.as_ref() == "sync.groups.search" {
             self.apply_sync_groups_search(text, cx);
         } else if let Some(group_id) = id.strip_prefix("sync.group-name.") {

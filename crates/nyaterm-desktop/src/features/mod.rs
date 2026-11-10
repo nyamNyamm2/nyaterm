@@ -70,3 +70,5 @@ pub(in crate::features) use font_catalog::{
     FontCatalogLoadState, FontCatalogPresentation, FontCatalogSnapshot, FontCatalogState,
     FontResolutionSource, FontResolutionStatus, font_names_fingerprint, normalize_font_family,
 };
+
+mod cluster;

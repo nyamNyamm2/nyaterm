@@ -373,6 +373,7 @@ fn staged_quick_command_cancellation_only_affects_competing_sync_target() {
     let mut fixture = WireFixture::new(2);
     fixture.cx.update_entity(&fixture.app, |app, _| {
         app.sync_input.create_group();
+        app.sync_input.toggle_selected_enabled();
         for id in &fixture.ids {
             app.sync_input.toggle_selected_session(id.clone());
         }
@@ -399,6 +400,7 @@ fn staged_quick_command_history_suppresses_sensitive_line_per_target() {
     let mut fixture = WireFixture::new(2);
     fixture.cx.update_entity(&fixture.app, |app, _| {
         app.sync_input.create_group();
+        app.sync_input.toggle_selected_enabled();
         for id in &fixture.ids {
             app.sync_input.toggle_selected_session(id.clone());
         }

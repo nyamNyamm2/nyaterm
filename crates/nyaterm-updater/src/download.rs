@@ -66,6 +66,9 @@ pub fn download_signed_update(
     check_cancel: impl Fn() -> Result<(), String>,
     mut progress: impl FnMut(u64, Option<u64>),
 ) -> Result<super::install::PreparedUpdate, String> {
+    if nyaterm_core::packaging::updates_managed_externally() {
+        return Err("Custom builds must be downloaded from the fork GitHub Actions channel".into());
+    }
     let version = parse_current_version(version).map_err(|error| error.to_string())?;
     if !nyaterm_core::app_identity::AppFlavor::current().accepts_update(&version) {
         return Err("update belongs to a different application flavor".into());

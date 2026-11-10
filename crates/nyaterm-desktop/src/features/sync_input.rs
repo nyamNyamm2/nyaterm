@@ -52,6 +52,14 @@ pub(in crate::features) struct SyncInputTransferBundle {
 }
 
 impl SyncInputFeatureState {
+    pub(in crate::features) fn disable_all(&mut self) {
+        self.broadcast_to_all = false;
+        for group in &mut self.groups {
+            group.enabled = false;
+        }
+        self.note_routing_change();
+    }
+
     pub(in crate::features) fn revision(&self) -> u64 {
         self.revision
     }
@@ -206,7 +214,7 @@ impl SyncInputFeatureState {
             color: self.next_group_color(),
             session_ids: Vec::new(),
             paused_session_ids: Vec::new(),
-            enabled: true,
+            enabled: false,
         };
         self.selected_id = Some(group.id.clone());
         self.groups.push(group);
@@ -1075,6 +1083,21 @@ mod tests {
             paused_session_ids: Vec::new(),
             enabled: true,
         }
+    }
+
+    #[test]
+    fn new_groups_start_off_and_stop_all_disables_every_route() {
+        let mut state = state();
+        assert!(!state.input_selection_active());
+        state.create_group();
+        assert!(!state.input_selection_active());
+        state.toggle_selected_enabled();
+        state.toggle_broadcast_to_all();
+        assert!(state.input_selection_active());
+        let revision = state.revision();
+        state.disable_all();
+        assert!(!state.input_selection_active());
+        assert!(state.revision() > revision);
     }
 
     #[test]
