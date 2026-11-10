@@ -6,7 +6,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: custom-windows-${{ github.ref }}
   cancel-in-progress: true
@@ -15,32 +15,14 @@ env:
   CARGO_INCREMENTAL: '0'
   NYATERM_PACKAGE_MANAGER: nyamNyamm2-custom-manual
 jobs:
-  windows:
+  validate:
+    name: Rust and UI validation
     runs-on: windows-2025
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      # Temporary source transfer, removed once the reviewed patch is committed.
-      - name: Apply reviewed compile and safety fixes
-        if: github.ref == 'refs/heads/feature/cluster-managers-sidebar'
-        shell: bash
-        run: |
-          python - <<'PYCODE'
-          import base64, zlib, pathlib
-          pathlib.Path('cluster-fixes.patch').write_bytes(zlib.decompress(base64.b64decode('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')))
-          PYCODE
-          if git apply --check cluster-fixes.patch; then
-            git apply cluster-fixes.patch
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add Cargo.lock crates examples
-            git commit -m 'fix(desktop): borrow input entities and bound cluster output'
-            git push origin HEAD:feature/cluster-managers-sidebar
-          else
-            git apply --reverse --check cluster-fixes.patch
-          fi
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -53,14 +35,46 @@ jobs:
           cache-on-failure: 'true'
       - name: Formatting
         run: cargo fmt --all -- --check
-      - name: Rust policy and integration tests
-        run: cargo test --locked -p nyaterm-cluster-commands -p nyaterm-remote-ops -p nyaterm-core -p nyaterm-updater
       - name: Check workspace
         run: cargo check --locked --workspace
+      - name: Rust policy and integration tests
+        run: cargo test --locked -p nyaterm-cluster-commands -p nyaterm-remote-ops -p nyaterm-core -p nyaterm-updater
       - name: Desktop state and UI tests
         run: cargo test --locked -p nyaterm-desktop --lib
-      - name: Build external SDK plugins
+      - name: Clippy
+        run: cargo clippy --locked --workspace --all-targets
+      - name: Build and validate external SDK plugins
         run: python scripts/plugins/build.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NyaTerm-cluster-tools-plugin-${{ github.sha }}
+          path: target/plugin-examples/cluster-tools.zip
+          if-no-files-found: error
+          retention-days: 90
+  package:
+    name: Windows EXE and Portable ZIP
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve custom package version
+        shell: pwsh
+        run: |
+          $version = python -c "import tomllib; print(tomllib.load(open('Cargo.toml', 'rb'))['workspace']['package']['version'])"
+          "NYATERM_VERSION=$version" >> $env:GITHUB_ENV
+          $separator = if ($version.Contains('-')) { '.' } else { '-' }
+          "NYATERM_ARTIFACT_VERSION=$version${separator}custom.1" >> $env:GITHUB_ENV
+      - uses: ./.github/actions/setup-rust
+        with:
+          targets: x86_64-pc-windows-msvc
+          cache-key: custom-windows-package
+          save-cache: always
+          cache-on-failure: 'true'
       - name: Install NSIS
         shell: pwsh
         run: ./scripts/ci/install-nsis.ps1
@@ -68,17 +82,26 @@ jobs:
         run: python scripts/release/prepare_conpty.py
       - name: Build Windows x64 installer and portable ZIP
         shell: pwsh
-        env:
-          NYATERM_ARTIFACT_VERSION: 2.0.4-custom.1
         run: python scripts/release/package_native.py x86_64-pc-windows-msvc
       - name: Verify packages
-        run: python scripts/release/verify_native_package.py --target x86_64-pc-windows-msvc --version 2.0.4 --artifact-version 2.0.4-custom.1 --dist dist
+        shell: pwsh
+        run: python scripts/release/verify_native_package.py --target x86_64-pc-windows-msvc --version "$env:NYATERM_VERSION" --artifact-version "$env:NYATERM_ARTIFACT_VERSION" --dist dist
+      - name: Record source and checksums
+        shell: python
+        run: |
+          import hashlib, pathlib, subprocess
+          dist = pathlib.Path('dist')
+          (dist / 'SOURCE_COMMIT.txt').write_text(subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True))
+          assets = sorted(dist.glob('*-setup.exe')) + sorted(dist.glob('*_portable.zip'))
+          assert len(assets) == 2
+          (dist / 'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + '\n' for p in assets))
       - uses: actions/upload-artifact@v4
         with:
           name: NyaTerm-custom-Windows-x64-${{ github.sha }}
           path: |
             dist/*-setup.exe
             dist/*_portable.zip
-            target/plugin-examples/cluster-tools.zip
+            dist/SOURCE_COMMIT.txt
+            dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 90
