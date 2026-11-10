@@ -2428,6 +2428,7 @@ mod tests {
             let metadata = app.session.metadata("fixture").unwrap().clone();
             let mut ids = Vec::new();
             app.sync_input.create_group();
+            app.sync_input.toggle_selected_enabled();
             for index in 0..2 {
                 let config = TelnetSessionConfig {
                     host: "127.0.0.1".into(),
